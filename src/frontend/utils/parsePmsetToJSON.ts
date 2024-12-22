@@ -35,7 +35,7 @@ interface PowerSettings {
     return Number.isInteger(num) && num.toString() === str; // 检查是否为整数且转换前后值相等
   }
   
-  function parsePowerSettings(input: string): BatteryACPowerSettings {
+  function parsePmsetToJSON(input: string): BatteryACPowerSettings {
     const settings: BatteryACPowerSettings = { BatteryPower: {}, ACPower: {} };
     let currentSection:"BatteryPower"|"ACPower" = 'BatteryPower';
   
@@ -68,7 +68,7 @@ interface PowerSettings {
     return settings;
   }
   
-  export default parsePowerSettings;
+  export default parsePmsetToJSON;
 
   // 示例字符串
   const powerSettingsString = `

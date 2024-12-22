@@ -1,79 +1,139 @@
-import { useCallback, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
-import parsePowerSettings from "./utils/parsePmsetToJSON";
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
+import BottomNavigation from '@mui/material/BottomNavigation';
+import BottomNavigationAction from '@mui/material/BottomNavigationAction';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
+import PowerIcon from '@mui/icons-material/Power';
+import MoreIcon from '@mui/icons-material/More';
+import Paper from '@mui/material/Paper';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import Avatar from '@mui/material/Avatar';
+import GPUSetter from './components/GPUSetter';
+import Divider from '@mui/material/Divider';
+import MorePage from './pages/MorePage';
+import BatteryPage from './pages/BatteryPage';
+import ACPage from './pages/ACPage';
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [nodeVersion, setNodeVersion] = useState<string | undefined>(undefined);
-  const [pmsetStr,setPmsetStr] = useState<string>("");
+enum TabKeys {
+  BATTERY_SETTING = "BATTERY_SETTING",
+  AC_SETTING = "AC_SETTING",
+  MORE = "MORE",
+}
 
-  const updateNodeVersion = useCallback(
-    async () =>
-      setNodeVersion(await backend.nodeVersion("Hello from App.tsx!")),
-    []
-  );
+function refreshMessages(): MessageExample[] {
+  const getRandomInt = (max: number) => Math.floor(Math.random() * Math.floor(max));
 
-  const getPmset = useCallback(
-    async () => {
-      try{
-        const result = await backend.getPmset();
-        console.log("getPmset",parsePowerSettings(result));
-        setPmsetStr(result);
-      }catch(error){
-        throw error;
-      }
-    },
-    []
-  );
-
-  const sudoGetPmset = useCallback(
-    async () => {
-      try{
-        const result = await backend.sudoGetPmset();
-        console.log("sudoGetPmset",result);
-        setPmsetStr(result);
-      }catch(error){
-        throw(error);
-      }
-    },
-    []
-  );
-
-  return (
-    <div className="App">
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-        <button onClick={updateNodeVersion}>
-          Node version is {nodeVersion}
-        </button>
-        <button onClick={getPmset}>
-          getPmset
-        </button>
-        <button onClick={sudoGetPmset}>
-          sudoGetPmset
-        </button>
-        <button onClick={()=>setPmsetStr("")}>
-          clearPmset
-        </button>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <h3>pmset:</h3>
-      <pre>
-        {
-          pmsetStr
-        }
-      </pre>
-    </div>
+  return Array.from(new Array(50)).map(
+    () => messageExamples[getRandomInt(messageExamples.length)],
   );
 }
 
-export default App;
+export default function FixedBottomNavigation() {
+  const [currentTabKey, setCurrentTabKey] = React.useState<TabKeys>(TabKeys.BATTERY_SETTING);
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = React.useState(() => refreshMessages());
+
+  React.useEffect(() => {
+    (ref.current as HTMLDivElement).ownerDocument.body.scrollTop = 0;
+    setMessages(refreshMessages());
+  }, [currentTabKey, setCurrentTabKey]);
+
+  return (
+    <Box sx={{ pb: 7 }} ref={ref}>
+      <CssBaseline />
+      {/* <List>
+        {messages.map(({ primary, secondary, person }, index) => (
+          <ListItemButton key={index + person}>
+            <ListItemAvatar>
+              <Avatar alt="Profile Picture" src={person} />
+            </ListItemAvatar>
+            <ListItemText primary={primary} secondary={secondary} />
+          </ListItemButton>
+        ))}
+      </List> */}
+      {/* <GPUSetter/>
+      <Divider/>
+      <GPUSetter/> */}
+      {
+        currentTabKey===TabKeys.BATTERY_SETTING
+        &&
+        <BatteryPage/>
+      }
+      {
+        currentTabKey===TabKeys.AC_SETTING
+        &&
+        <ACPage/>
+      }
+      {
+        currentTabKey===TabKeys.MORE
+        &&
+        <MorePage/>
+      }
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <BottomNavigation
+          showLabels
+          value={currentTabKey}
+          onChange={(event, newValue) => {
+            setCurrentTabKey(newValue);
+          }}
+        >
+          <BottomNavigationAction label="Battery" icon={<BatteryFullIcon />} value={TabKeys.BATTERY_SETTING}/>
+          <BottomNavigationAction label="AC" icon={<PowerIcon />} value={TabKeys.AC_SETTING}/>
+          <BottomNavigationAction label="More" icon={<MoreIcon />} value={TabKeys.MORE}/>
+        </BottomNavigation>
+      </Paper>
+    </Box>
+  );
+}
+
+interface MessageExample {
+  primary: string;
+  secondary: string;
+  person: string;
+}
+
+const messageExamples: readonly MessageExample[] = [
+  {
+    primary: 'Brunch this week?',
+    secondary: "I'll be in the neighbourhood this week. Let's grab a bite to eat",
+    person: '/static/images/avatar/5.jpg',
+  },
+  {
+    primary: 'Birthday Gift',
+    secondary: `Do you have a suggestion for a good present for John on his work
+      anniversary. I am really confused & would love your thoughts on it.`,
+    person: '/static/images/avatar/1.jpg',
+  },
+  {
+    primary: 'Recipe to try',
+    secondary: 'I am try out this new BBQ recipe, I think this might be amazing',
+    person: '/static/images/avatar/2.jpg',
+  },
+  {
+    primary: 'Yes!',
+    secondary: 'I have the tickets to the ReactConf for this year.',
+    person: '/static/images/avatar/3.jpg',
+  },
+  {
+    primary: "Doctor's Appointment",
+    secondary: 'My appointment for the doctor was rescheduled for next Saturday.',
+    person: '/static/images/avatar/4.jpg',
+  },
+  {
+    primary: 'Discussion',
+    secondary: `Menus that are generated by the bottom app bar (such as a bottom
+      navigation drawer or overflow menu) open as bottom sheets at a higher elevation
+      than the bar.`,
+    person: '/static/images/avatar/5.jpg',
+  },
+  {
+    primary: 'Summer BBQ',
+    secondary: `Who wants to have a cookout this weekend? I just got some furniture
+      for my backyard and would love to fire up the grill.`,
+    person: '/static/images/avatar/1.jpg',
+  },
+];
