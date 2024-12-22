@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
+import parsePowerSettings from "./utils/parsePmsetToJSON";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -15,32 +16,32 @@ function App() {
 
   const getPmset = useCallback(
     async () => {
-      const result = await backend.getPmset();
-      console.log("getPmset",result);
-      setPmsetStr(result);
+      try{
+        const result = await backend.getPmset();
+        console.log("getPmset",parsePowerSettings(result));
+        setPmsetStr(result);
+      }catch(error){
+        throw error;
+      }
     },
     []
   );
 
   const sudoGetPmset = useCallback(
     async () => {
-      const result = await backend.sudoGetPmset();
-      console.log("sudoGetPmset",result);
-      setPmsetStr(result);
+      try{
+        const result = await backend.sudoGetPmset();
+        console.log("sudoGetPmset",result);
+        setPmsetStr(result);
+      }catch(error){
+        throw(error);
+      }
     },
     []
   );
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="./vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
       <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
