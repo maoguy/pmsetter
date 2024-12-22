@@ -15,7 +15,6 @@ ipcMain.handle(
 ipcMain.handle(
   "get-pmset",
   async(event: IpcMainInvokeEvent, msg: string):Promise<string>=>{
-    console.log("get-pmset")
     try {
       // 使用 await 等待命令执行完成
       const { stdout, stderr } = await execAsync('pmset -g custom');
