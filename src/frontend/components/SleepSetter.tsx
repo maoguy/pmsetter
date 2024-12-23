@@ -61,7 +61,7 @@ export default function SleepSetter(props:TProps) {
 
   return (
     <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
+      sx={{ width: '100%'}}
       subheader={
         <ListSubheader
           style={{zIndex:0}}
