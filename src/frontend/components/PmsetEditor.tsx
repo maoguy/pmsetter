@@ -1,8 +1,10 @@
 
 import {useState,useCallback,useEffect,useMemo} from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
-import GPUSetter from './GPUSetter';
 import parsePmsetToJSON from "../utils/parsePmsetToJSON";
+import GPUSetter,{TGpuswitch} from './GPUSetter';
+import HibernatemodeSetter,{THibernatemode} from './HibernatemodeSetter';
+import SleepSetter,{TSleep} from './SleepSetter';
 
 export enum PmsetTypes {
   BATTERY = "BATTERY",
@@ -35,6 +37,7 @@ const PmsetEditor = (props:TProps) => {
 
   const getPmset = useCallback(
     async () => {
+      setIsLoading(true);
       try{
         const result = await backend.getPmset();
         console.log("getPmset",parsePmsetToJSON(result));
@@ -42,14 +45,35 @@ const PmsetEditor = (props:TProps) => {
       }catch(error){
         throw error;
       }
+      setIsLoading(false);
     },
     []
   );
 
-  async function updatePmsetGpuswitch (value:0|1|2) {
+  async function updatePmsetGpuswitch (value:TGpuswitch) {
     try{
       const result = await backend.sudoSetPmset(type,"gpuswitch",value.toString());
       console.log("gpuswitch update",result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+
+  async function updateHibernatemode (value:THibernatemode) {
+    try{
+      const result = await backend.sudoSetPmset(type,"hibernatemode",value.toString());
+      console.log("hibernatemode update",result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+  
+  async function updateSleep (value:TSleep) {
+    try{
+      const result = await backend.sudoSetPmset(type,"sleep",value.toString());
+      console.log("sleep update",result)
       await getPmset();
     }catch(error){
       throw(error);
@@ -74,6 +98,22 @@ const PmsetEditor = (props:TProps) => {
         <GPUSetter
           value={currentConfig?.gpuswitch}
           onChange={updatePmsetGpuswitch}
+        />
+      }
+      {
+        currentConfig?.hibernatemode!==undefined
+        &&
+        <HibernatemodeSetter
+          value={currentConfig?.hibernatemode}
+          onChange={updateHibernatemode}
+        />
+      }
+      {
+        currentConfig?.sleep!==undefined
+        &&
+        <SleepSetter
+          value={currentConfig?.sleep}
+          onChange={updateSleep}
         />
       }
       

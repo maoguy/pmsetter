@@ -9,6 +9,7 @@ interface PowerSettings {
     hibernatemode?: number;
     powernap?: number;
     gpuswitch?: number;
+    sleep?:number;
     hibernatefile?: string;
     ttyskeepawake?: number;
     highstandbythreshold?: number;

@@ -9,7 +9,7 @@ const isPreview = process.env.PREVIEW != undefined;
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 600,
-    height: 400,
+    height: 600,
     webPreferences: {
       preload: join(__dirname, "preload.js"),
       // nodeIntegration: true, // 如果需要在渲染器进程中使用 Node.js
