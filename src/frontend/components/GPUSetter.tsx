@@ -9,10 +9,10 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import AccessibleForwardIcon from '@mui/icons-material/AccessibleForward';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 
-export type TGpuswitch = 0|1|2;
+export type TGpuswitch = 0|1|2|number;
 
 interface TProps {
-  value?:number;
+  value?:TGpuswitch;
   onChange:(value:TGpuswitch)=>void;
 }
 
@@ -26,11 +26,9 @@ export default function GPUSetter(props:TProps) {
 
   return (
     <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
+      sx={{ width: '100%' }}
       subheader={
-        <ListSubheader
-          style={{zIndex:0}}
-        >
+        <ListSubheader>
           Gpu Switch(GPU切换模式)
         </ListSubheader>
       }

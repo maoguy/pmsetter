@@ -27,11 +27,9 @@ export default function HibernatemodeSetter(props:TProps) {
 
   return (
     <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
+      sx={{ width: '100%' }}
       subheader={
-        <ListSubheader
-          style={{zIndex:0}}
-        >
+        <ListSubheader>
           Hibernatemode(冬眠模式)
         </ListSubheader>
       }

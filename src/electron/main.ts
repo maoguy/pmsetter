@@ -15,6 +15,7 @@ function createWindow() {
       // nodeIntegration: true, // 如果需要在渲染器进程中使用 Node.js
       // contextIsolation: false, // 如果需要在渲染器进程中使用 Node.js
     },
+    icon:join(__dirname,'../../public/pmset-icon.jpg')
   });
 
   if (isDev) {

@@ -5,6 +5,11 @@ import parsePmsetToJSON from "../utils/parsePmsetToJSON";
 import GPUSetter,{TGpuswitch} from './GPUSetter';
 import HibernatemodeSetter,{THibernatemode} from './HibernatemodeSetter';
 import SleepSetter,{TSleep} from './SleepSetter';
+import HighstandbythresholdSetter,{THighstandbythreshold} from './HighstandbythresholdSetter';
+import StandbydelaySetter,{TStandbydelay,TStandbydelayTypes} from './StandbydelaySetter';
+import StanbySetter,{TStanbySwitch} from './StanbySetter';
+import AutopoweroffSetter,{TAutopoweroffSwitch} from './AutopoweroffSetter';
+import AutopoweroffdelaySetter,{TAutopoweroffdelay} from './AutopoweroffdelaySetter';
 
 export enum PmsetTypes {
   BATTERY = "BATTERY",
@@ -80,6 +85,60 @@ const PmsetEditor = (props:TProps) => {
     }
   }
 
+  async function updateHighstandbythreshold (value:THighstandbythreshold) {
+    try{
+      const result = await backend.sudoSetPmset(type,"highstandbythreshold",value.toString());
+      console.log("highstandbythreshold update",result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+
+  async function updateStanbySwitch (value:TStanbySwitch) {
+    try{
+      const result = await backend.sudoSetPmset(type,"stanby",value.toString());
+      console.log("stanby update",result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+
+  function getFuncOfUpdatStandbydelay (standbydelayType:TStandbydelayTypes) {
+    const suffix = standbydelayType===TStandbydelayTypes.HIGH?"high":"low";
+    async function updateStandbydelay (value:TStandbydelay) {
+      try{
+        const result = await backend.sudoSetPmset(type,`standbydelay${suffix}`,value.toString());
+        console.log(`standbydelay${suffix} update`,result)
+        await getPmset();
+      }catch(error){
+        throw(error);
+      }
+    }
+    return updateStandbydelay;
+  }
+
+  async function updateAutopoweroffSwitch (value:TAutopoweroffSwitch) {
+    try{
+      const result = await backend.sudoSetPmset(type,"autopoweroff",value.toString());
+      console.log("autopoweroff update",result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+
+  async function updateAutopoweroffdelay (value:TAutopoweroffdelay) {
+    try{
+      const result = await backend.sudoSetPmset(type,`autopoweroffdelay`,value.toString());
+      console.log(`autopoweroffdelay update`,result)
+      await getPmset();
+    }catch(error){
+      throw(error);
+    }
+  }
+
   useEffect(()=>{
     //初始化时调用
     getPmset();
@@ -116,7 +175,56 @@ const PmsetEditor = (props:TProps) => {
           onChange={updateSleep}
         />
       }
-      
+      {
+        currentConfig?.highstandbythreshold!==undefined
+        &&
+        <HighstandbythresholdSetter
+          value={currentConfig?.highstandbythreshold}
+          onChange={updateHighstandbythreshold}
+        />
+      }
+      {
+        currentConfig?.standby!==undefined
+        &&
+        <StanbySetter
+          value={currentConfig?.standby}
+          onChange={updateStanbySwitch}
+        />
+      }
+      {
+        currentConfig?.standbydelayhigh!==undefined
+        &&
+        <StandbydelaySetter
+          type={TStandbydelayTypes.HIGH}
+          value={currentConfig?.standbydelayhigh}
+          onChange={getFuncOfUpdatStandbydelay(TStandbydelayTypes.HIGH)}
+        />
+      }
+      {
+        currentConfig?.standbydelaylow!==undefined
+        &&
+        <StandbydelaySetter
+          type={TStandbydelayTypes.LOW}
+          value={currentConfig?.standbydelaylow}
+          onChange={getFuncOfUpdatStandbydelay(TStandbydelayTypes.LOW)}
+        />
+      }
+      {
+        currentConfig?.autopoweroff!==undefined
+        &&
+        <AutopoweroffSetter
+          value={currentConfig?.autopoweroff}
+          onChange={updateAutopoweroffSwitch}
+        />
+      }
+      {
+        currentConfig?.autopoweroffdelay!==undefined
+        &&
+        <AutopoweroffdelaySetter
+          value={currentConfig?.autopoweroffdelay}
+          onChange={updateAutopoweroffdelay}
+        />
+      }
       {/* <pre>
       {
         JSON.stringify(currentConfig,null,2)
