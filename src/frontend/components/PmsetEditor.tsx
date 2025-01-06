@@ -10,6 +10,16 @@ import StandbydelaySetter,{TStandbydelay,TStandbydelayTypes} from './Standbydela
 import StanbySetter,{TStanbySwitch} from './StanbySetter';
 import AutopoweroffSetter,{TAutopoweroffSwitch} from './AutopoweroffSetter';
 import AutopoweroffdelaySetter,{TAutopoweroffdelay} from './AutopoweroffdelaySetter';
+import DisplaysleepSetter,{TDisplaysleep} from './DisplaysleepSetter';
+import LessbrightSetter,{TLessbrightSwitch} from './LessbrightSetter';
+import DisksleepSetter,{TDisksleep} from './DisksleepSetter';
+import AcwakeSetter,{TAcwakeSwitch} from './AcwakeSetter';
+import HalfdimSetter,{THalfdimSwitch} from './HalfdimSetter';
+import LidwakeSetter, { TLidwakeSwitch } from './LidwakeSetter';
+import PowernapSetter, { TPowernapSwitch } from './PowernapSetter';
+import TtyskeepawakeSetter, { TTtyskeepawakeSwitch } from './TtyskeepawakeSetter';
+import WompSetter, { TWompSwitch } from './WompSetter';
+import Snackbar from '@mui/material/Snackbar';
 
 export enum PmsetTypes {
   BATTERY = "BATTERY",
@@ -24,7 +34,8 @@ const PmsetEditor = (props:TProps) => {
   const {type} = props;
   const [isLoading,setIsLoading] = useState<boolean>(false);
   const [pmsetStr,setPmsetStr] = useState<string>("");
-  
+  const [errorMsg,setErrorMsg] = useState<string|undefined>();
+
   const pmsetJSON = useMemo(()=>{
     return parsePmsetToJSON(pmsetStr);
   },[pmsetStr]);
@@ -55,88 +66,30 @@ const PmsetEditor = (props:TProps) => {
     []
   );
 
-  async function updatePmsetGpuswitch (value:TGpuswitch) {
-    try{
-      const result = await backend.sudoSetPmset(type,"gpuswitch",value.toString());
-      console.log("gpuswitch update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
-  }
-
-  async function updateHibernatemode (value:THibernatemode) {
-    try{
-      const result = await backend.sudoSetPmset(type,"hibernatemode",value.toString());
-      console.log("hibernatemode update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
-  }
-  
-  async function updateSleep (value:TSleep) {
-    try{
-      const result = await backend.sudoSetPmset(type,"sleep",value.toString());
-      console.log("sleep update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
-  }
-
-  async function updateHighstandbythreshold (value:THighstandbythreshold) {
-    try{
-      const result = await backend.sudoSetPmset(type,"highstandbythreshold",value.toString());
-      console.log("highstandbythreshold update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
-  }
-
-  async function updateStanbySwitch (value:TStanbySwitch) {
-    try{
-      const result = await backend.sudoSetPmset(type,"stanby",value.toString());
-      console.log("stanby update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
-  }
-
   function getFuncOfUpdatStandbydelay (standbydelayType:TStandbydelayTypes) {
     const suffix = standbydelayType===TStandbydelayTypes.HIGH?"high":"low";
-    async function updateStandbydelay (value:TStandbydelay) {
-      try{
-        const result = await backend.sudoSetPmset(type,`standbydelay${suffix}`,value.toString());
-        console.log(`standbydelay${suffix} update`,result)
-        await getPmset();
-      }catch(error){
-        throw(error);
-      }
-    }
+    const updateStandbydelay = getUpdateFunc<TStandbydelay>(`standbydelay${suffix}`);
     return updateStandbydelay;
   }
 
-  async function updateAutopoweroffSwitch (value:TAutopoweroffSwitch) {
-    try{
-      const result = await backend.sudoSetPmset(type,"autopoweroff",value.toString());
-      console.log("autopoweroff update",result)
-      await getPmset();
-    }catch(error){
-      throw(error);
+  function getUpdateFunc<TValue>(key:string) {
+    async function updateValue (value:TValue) {
+      try{
+        const result = await backend.sudoSetPmset(type,key,(value as any).toString());
+        console.log(`${key} update`,result);
+        await getPmset();
+      }catch(error){
+        console.log(error)
+        setErrorMsg((error as any).toString());
+        throw(error);
+      }
     }
+    return updateValue;
   }
 
-  async function updateAutopoweroffdelay (value:TAutopoweroffdelay) {
-    try{
-      const result = await backend.sudoSetPmset(type,`autopoweroffdelay`,value.toString());
-      console.log(`autopoweroffdelay update`,result)
-      await getPmset();
-    }catch(error){
-      throw(error);
-    }
+  function clearErrorMsg () {
+    //清空错误信息
+    setErrorMsg(undefined);
   }
 
   useEffect(()=>{
@@ -156,7 +109,7 @@ const PmsetEditor = (props:TProps) => {
         &&
         <GPUSetter
           value={currentConfig?.gpuswitch}
-          onChange={updatePmsetGpuswitch}
+          onChange={getUpdateFunc<TGpuswitch>('gpuswitch')}
         />
       }
       {
@@ -164,7 +117,7 @@ const PmsetEditor = (props:TProps) => {
         &&
         <HibernatemodeSetter
           value={currentConfig?.hibernatemode}
-          onChange={updateHibernatemode}
+          onChange={getUpdateFunc<THibernatemode>("hibernatemode")}
         />
       }
       {
@@ -172,7 +125,23 @@ const PmsetEditor = (props:TProps) => {
         &&
         <SleepSetter
           value={currentConfig?.sleep}
-          onChange={updateSleep}
+          onChange={getUpdateFunc<TSleep>("sleep")}
+        />
+      }
+      {
+        currentConfig?.displaysleep!==undefined
+        &&
+        <DisplaysleepSetter
+          value={currentConfig?.displaysleep}
+          onChange={getUpdateFunc<TDisplaysleep>("displaysleep")}
+        />
+      }
+      {
+        currentConfig?.disksleep!==undefined
+        &&
+        <DisksleepSetter
+          value={currentConfig?.disksleep}
+          onChange={getUpdateFunc<TDisksleep>("disksleep")}
         />
       }
       {
@@ -180,7 +149,7 @@ const PmsetEditor = (props:TProps) => {
         &&
         <HighstandbythresholdSetter
           value={currentConfig?.highstandbythreshold}
-          onChange={updateHighstandbythreshold}
+          onChange={getUpdateFunc<THighstandbythreshold>("highstandbythreshold")}
         />
       }
       {
@@ -188,7 +157,7 @@ const PmsetEditor = (props:TProps) => {
         &&
         <StanbySetter
           value={currentConfig?.standby}
-          onChange={updateStanbySwitch}
+          onChange={getUpdateFunc<TStanbySwitch>("standby")}
         />
       }
       {
@@ -214,7 +183,7 @@ const PmsetEditor = (props:TProps) => {
         &&
         <AutopoweroffSetter
           value={currentConfig?.autopoweroff}
-          onChange={updateAutopoweroffSwitch}
+          onChange={getUpdateFunc<TAutopoweroffSwitch>("autopoweroff")}
         />
       }
       {
@@ -222,7 +191,79 @@ const PmsetEditor = (props:TProps) => {
         &&
         <AutopoweroffdelaySetter
           value={currentConfig?.autopoweroffdelay}
-          onChange={updateAutopoweroffdelay}
+          onChange={getUpdateFunc<TAutopoweroffdelay>("autopoweroffdelay")}
+        />
+      }
+
+      {
+        currentConfig?.lidwake!==undefined
+        &&
+        <LidwakeSetter
+          value={currentConfig?.lidwake}
+          onChange={getUpdateFunc<TLidwakeSwitch>("lidwake")}
+        />
+      }
+
+      {
+        currentConfig?.halfdim!==undefined
+        &&
+        <HalfdimSetter
+          value={currentConfig?.halfdim}
+          onChange={getUpdateFunc<THalfdimSwitch>("halfdim")}
+        />
+      }
+
+      {
+        currentConfig?.lessbright!==undefined
+        &&
+        <LessbrightSetter
+          value={currentConfig?.lessbright}
+          onChange={getUpdateFunc<TLessbrightSwitch>("lessbright")}
+        />
+      }
+
+      {
+        currentConfig?.acwake!==undefined
+        &&
+        <AcwakeSetter
+          value={currentConfig?.acwake}
+          onChange={getUpdateFunc<TAcwakeSwitch>("acwake")}
+        />
+      }
+
+      {
+        currentConfig?.powernap!==undefined
+        &&
+        <PowernapSetter
+          value={currentConfig?.powernap}
+          onChange={getUpdateFunc<TPowernapSwitch>("powernap")}
+        />
+      }
+
+      {
+        currentConfig?.ttyskeepawake!==undefined
+        &&
+        <TtyskeepawakeSetter
+          value={currentConfig?.ttyskeepawake}
+          onChange={getUpdateFunc<TTtyskeepawakeSwitch>("ttyskeepawake")}
+        />
+      }
+
+      {
+        currentConfig?.womp!==undefined
+        &&
+        <WompSetter
+          value={currentConfig?.womp}
+          onChange={getUpdateFunc<TWompSwitch>("womp")}
+        />
+      }
+
+      {
+        <Snackbar
+          open={errorMsg!==undefined}
+          autoHideDuration={2000}
+          onClose={clearErrorMsg}
+          message={errorMsg}
         />
       }
       {/* <pre>

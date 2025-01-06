@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import TuneIcon from '@mui/icons-material/Tune';
 
-export type TValue = 0|1|number;
+export type TValue = 0|1;
 
 interface TProps {
   title:string;
