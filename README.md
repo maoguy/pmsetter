@@ -23,7 +23,10 @@
 
 ## 截图
 
-![pmsetter.png](docs/imgs/screenshots/pmsetter.png)
+![pmsetter-1.png](docs/imgs/screenshots/pmsetter-1.png)
+
+
+![pmsetter-2.png](docs/imgs/screenshots/pmsetter-2.png)
 
 # pmsetter
 an Electron app with React, TypeScript, and Vite.
