@@ -1,5 +1,7 @@
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: './public/pmset-cat'
+  },
   rebuildConfig: {},
   makers: [
     {
@@ -9,6 +11,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
+      config:{
+      }
     },
     {
       name: '@electron-forge/maker-deb',

@@ -1,5 +1,5 @@
 <p align="center">
-<img src="./docs/imgs/pmset-icon.jpg" height="80"/>
+<img src="./docs/imgs/pmset-cat.png" height="80"/>
 </p>
 
 <div align="center">

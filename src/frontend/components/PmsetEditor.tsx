@@ -161,6 +161,15 @@ const PmsetEditor = (props:TProps) => {
         />
       }
       {
+        currentConfig?.standbydelay!==undefined
+        &&
+        <StandbydelaySetter
+          type={TStandbydelayTypes.DEFAULT}
+          value={currentConfig?.standbydelay}
+          onChange={getFuncOfUpdatStandbydelay(TStandbydelayTypes.DEFAULT)}
+        />
+      }
+      {
         currentConfig?.standbydelayhigh!==undefined
         &&
         <StandbydelaySetter

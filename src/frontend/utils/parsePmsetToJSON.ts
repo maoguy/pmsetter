@@ -7,6 +7,7 @@ interface PowerSettings {
   standbydelayhigh?: number;
   autopoweroffdelay?: number;
   standbydelaylow?: number;
+  standbydelay?: number;
   standby?: TSwitch;
   proximitywake?: number;
   hibernatemode?: number;
